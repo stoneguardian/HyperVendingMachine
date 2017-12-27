@@ -1,0 +1,13 @@
+{
+    "Name": "Test-OK-1Switch-1Drive",
+    "CPU": 1,
+    "DynamicMemory": false,
+    "NetworkSwitch": [
+        "Default Switch"
+    ],
+    "Disks": [
+        {
+            "Size": 10737418240
+        }
+    ]
+}

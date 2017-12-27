@@ -1,0 +1,12 @@
+{
+    "CPU": 1,
+    "DynamicMemory": false,
+    "NetworkSwitch": [
+        "Default Switch"
+    ],
+    "Disks": [
+        {
+            "Size": 10737418240
+        }
+    ]
+}
