@@ -12,18 +12,19 @@ $TestModuleConfig = @{
         Base       = "TestDrive:\HVM"
         Incoming   = @{
             Base = "Input"
-            VMs  = "VM\"
+            VMs  = "VM"
         }
         Enqueued   = @{
             Base     = "ReadOnly\Enqueued"
-            ToCreate = "New\"
-            ToChange = "Set\"
+            ToCreate = "New"
+            ToChange = "Set"
         }
         Processing = @{
             Base     = "ReadOnly\Processing"
-            ToCreate = "New\"
-            ToChange = "Set\"
+            ToCreate = "New"
+            ToChange = "Set"
         }
+        Status     = "ReadOnly\Status\"
         Task       = "ReadOnly\Tasks\"
         Error      = "ReadOnly\Error\"
     }
