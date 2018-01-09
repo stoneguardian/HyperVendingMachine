@@ -1,0 +1,14 @@
+{
+    "Name": "Test-SwitchNotFound",
+    "CPU": 1,
+    "Memory": 1073741824,
+    "DynamicMemory": false,
+    "NetworkSwitch": [
+        "NonExisting"
+    ],
+    "Disks": [
+        {
+            "Size": 10737418240
+        }
+    ]
+}
