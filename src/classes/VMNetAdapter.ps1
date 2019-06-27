@@ -3,8 +3,7 @@ class VMNetAdapter
     [ValidateNotNullOrEmpty()]
     [string] $VMName
 
-    [ValidateNotNullOrEmpty()]
-    [string] $AdapterName
+    [string] $AdapterName = 'Network Adapter'
 
     [ValidateNotNullOrEmpty()]
     [string] $SwitchName
@@ -18,7 +17,7 @@ class VMNetAdapter
         $this.VMName = $vmName
 
         $missingMandatoryProperties = $order |
-            PSCustomObjectContainsProperty -Name 'AdapterName', 'SwitchName' |
+            PSCustomObjectContainsProperty -Name 'SwitchName' |
             Where-Object { $_.PropertyOnObject -eq $false } |
             Select-Object -ExpandProperty 'Name'
         
@@ -27,8 +26,12 @@ class VMNetAdapter
             Write-Error -Message "The follow mandatory parameters were not given: `n -$($missingMandatoryProperties -join "`n -")" -ErrorAction Stop
         }
 
-        $this.AdapterName = $order.AdapterName
         $this.SwitchName = $order.SwitchName
+
+        if (PSCostomObjectContainsProperty -Name 'AdapterName' -InputObject $order -BoolOuput)
+        {
+            $this.AdapterName = $order.AdapterName
+        }
 
         if (PSCustomObjectContainsProperty -Name 'VlanId' -InputObject $order -BoolOutput)
         {
