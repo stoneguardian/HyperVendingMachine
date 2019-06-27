@@ -1,0 +1,4 @@
+@{
+    SecureBoot         = 'On'
+    SecureBootTemplate = 'MicrosoftUEFICertificateAuthority'
+}
