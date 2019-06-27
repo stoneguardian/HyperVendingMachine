@@ -39,9 +39,9 @@ function PSCustomObjectContainsProperty
             }
         }
     }
-}
+
     
-end
-{
-}
+    end
+    {
+    }
 }
