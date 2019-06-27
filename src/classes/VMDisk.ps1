@@ -8,7 +8,7 @@ class VMDisk
     [ValidateRange(0, 500GB)]
     [long] $SizeInBytes = 0
 
-    [ValidateSet('Fixed', 'Dynamic')]
+    [ValidateSet('Fixed', 'Dynamic', 'Differencing')]
     [string] $Type
 
     [long] $SizeInBytesOnDisk = 0
