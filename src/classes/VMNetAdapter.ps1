@@ -54,6 +54,7 @@ class VMNetAdapter
         $output = foreach ($adapter in $adapters)
         {
             $vlan = Get-VMNetworkAdapterVlan -VMName $vmName -VMNetworkAdapterName $adapter.Name
+            Write-Host "$(@($vlan).Count) vlans found"
 
             $out = [VMNetAdapter]::new($vmName)
             $out.AdapterName = $adapter.Name
