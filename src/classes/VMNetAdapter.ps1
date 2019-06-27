@@ -45,6 +45,7 @@ class VMNetAdapter
 
     static [VMNetAdapter[]] Discover([string]$vmName)
     {
+        Write-Host "--$vmName--"
         $adapters = Get-VMNetworkAdapter -VMName $vmName
 
         $output = foreach ($adapter in $adapters)
@@ -58,6 +59,7 @@ class VMNetAdapter
             $out.IPAddresses = $adapter.IPAddresses
             $out # Write-Output
         }
+        Write-Host "--$vmName--"
 
         return $output
     }
