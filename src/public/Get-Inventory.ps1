@@ -19,9 +19,16 @@ function Get-Inventory
 
         foreach ($vm in $allVMs)
         {
-            $result.VMs.Add([VM]::Discover($vm.Name))
-            $result.Disks.Add([VMDisk]::Discover($vm.Name))
-            $result.NetworkAdapters.Add([VMNetAdapter]::Discover($vm.Name))
+            $result.VMs.Add(([VM]::Discover($vm.Name)))
+            foreach ($disk in ([VMDisk]::Discover($vm.Name)))
+            {
+                $result.Disks.Add($disk)
+            }
+
+            foreach ($netAdapter in ([VMNetAdapter]::Discover($vm.Name)))
+            {
+                $result.NetworkAdapters.Add($netAdapter)
+            }
         }
 
         $result # Write-Output
