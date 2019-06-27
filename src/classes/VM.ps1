@@ -81,7 +81,6 @@ class VM
 
     static [VM] Discover([string]$name)
     {
-        Write-Host "--$name--"
         $vm = Get-VM -Name $name
         $vm_cpu = Get-VMProcessor -VMName $name
         $vm_mem = Get-VMMemory -VMName $name
@@ -97,7 +96,6 @@ class VM
         $output.StartupMemoryInBytes = $vm_mem.Startup
         $output.MaximumMemoryInBytes = $vm_mem.Maximum
         $output.MinimumMemoryInBytes = $vm_mem.Minimum
-        Write-Host "--$name--"
 
         return $output
     }
