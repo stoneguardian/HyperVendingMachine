@@ -6,12 +6,12 @@ class VMDisk
     [string] $Path
 
     [ValidateRange(0, 500GB)]
-    [int] $SizeInBytes = 0
+    [long] $SizeInBytes = 0
 
     [ValidateSet('Fixed', 'Dynamic')]
     [string] $Type
 
-    [int] $SizeInBytesOnDisk = 0
+    [long] $SizeInBytesOnDisk = 0
 
     VMDisk([string]$vmName, [PSCustomObject]$order)
     {
