@@ -20,7 +20,7 @@ function Get-AvailableResources
         $output['CPU']['Assigned'] = (Get-VM | Measure-Object -Property ProcessorCount -Sum).Sum
         $output['CPU']['Max'] = (Get-CimInstance -ClassName 'Win32_Processor' | Measure-Object -Property NumberOfLogicalProcessors -Sum).Sum * $ModuleConfig.OverprovisionFactors.CPU
         $output['CPU']['Available'] = $output['CPU']['Max'] - $output['CPU']['Assigned']
-        $output['CPU']['PercentageAssigned'] = [Math]::Round(($output['CPU']['Assigned'] * 100) / $output['CPU']['Max'], 2)
+        $output['CPU']['PercentageAssigned'] = [Math]::Ceiling(($output['CPU']['Assigned'] * 100) / $output['CPU']['Max'])
         $output['CPU']['OverprovisioningFactor'] = $ModuleConfig.OverprovisionFactors.CPU
 
         $output['Memory']['Assigned'] = (Get-VM | Measure-Object -Property MemoryStartup -Sum).Sum
