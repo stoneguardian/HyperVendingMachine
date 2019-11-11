@@ -101,4 +101,42 @@ class VM
 
         return $output
     }
+
+    [bool] Exists()
+    {
+        return $null -ne (Get-VM -Name $this.Name -ErrorAction SilentlyContinue)
+    }
+
+    [void] Create()
+    {
+        if (-not $this.Exists())
+        {
+            $newVmParams = @{
+                Name               = $this.Name
+                MemoryStartupBytes = $this.StartupMemoryInBytes
+                Path               = ([System.IO.FileInfo]$this.Path).Directory.FullName # Parent directory of "Path"
+                Generation         = $this.Generation
+                NoVHD              = $true # Disks are generated later
+            }
+
+            $null = New-VM @newVmParams -ErrorAction Stop
+        }
+    }
+
+    [hashtable] GetSetVmChanges()
+    {
+        $live = [VM]::Discover($this.Name)
+
+        $result = @{
+            Parametres     = @{ }
+            RequiresReboot = $false
+        }
+
+        if ($this.Generation -ne $live.Generation)
+        {
+            Write-Warning "VM-generation cannot be changed, create a new VM"
+        }
+
+        
+    }
 }
