@@ -122,21 +122,4 @@ class VM
             $null = New-VM @newVmParams -ErrorAction Stop
         }
     }
-
-    [hashtable] GetSetVmChanges()
-    {
-        $live = [VM]::Discover($this.Name)
-
-        $result = @{
-            Parametres     = @{ }
-            RequiresReboot = $false
-        }
-
-        if ($this.Generation -ne $live.Generation)
-        {
-            Write-Warning "VM-generation cannot be changed, create a new VM"
-        }
-
-        
-    }
 }
