@@ -7,5 +7,7 @@
     }
 
     # Where to store created VMs (configs, disks, snapshots)
-    VMStoragePath        = 'D:\HyperVendingMaching\VMs'
+    VMStoragePath        = 'D:\HyperVendingMachine\VMs'
+    OrderBasePath        = 'D:\HyperVendingMachine\Orders'
+    TemplateBasePath     = 'D:\HyperVendingMachine\Templates'
 }
