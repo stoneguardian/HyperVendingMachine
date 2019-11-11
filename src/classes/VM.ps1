@@ -5,13 +5,15 @@ class VM
 
     [string] $Path
 
+    [ValidateSet(1, 2)]
     [int] $Generation = 2
 
-    [ValidateSet('StartIfRunning', 'Start', 'Other valid values')]
+    [ValidateSet('StartIfRunning', 'Start', 'Nothing')]
     [string] $AutomaticStartAction = 'StartIfRunning'
 
     [int] $AutomaticStartDelay = 0
 
+    [ValidateSet('Save', 'ShutDown', 'TurnOff')]
     [string] $AutomaticStopAction = 'Save'
 
     [int] $ProcessorCount = 1
