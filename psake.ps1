@@ -24,7 +24,7 @@ task CopyItems -depends 'Init' {
     Copy-Item -Path "$SourcePath/$ModuleName.psd1" -Destination $ReleasePath
     Copy-Item -Path "$SourcePath/Configuration.psd1" -Destination $ReleasePath
     Copy-Item -Path "$SourcePath/config" -Destination $ReleasePath
-    Copy-Item -Path "$SourcePath/templates" -Destination $ReleasePath
+    Copy-Item -Path "$SourcePath/templates" -Destination $ReleasePath -Recurse
 }
 
 task BuildPSD1 -depends 'Init' {
