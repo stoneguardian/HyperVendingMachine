@@ -29,7 +29,7 @@ class VM
     VM([PSCustomObject]$order, [string]$baseStoragePath)
     {
         $missingMandatoryProperties = $order |
-            PSCustomObjectContainsProperty -Name 'Name', 'StartupMemoryInBytes'
+        PSCustomObjectContainsProperty -Name 'Name', 'StartupMemoryInBytes'
 
         if (@($missingMandatoryProperties).Count -gt 0)
         {
