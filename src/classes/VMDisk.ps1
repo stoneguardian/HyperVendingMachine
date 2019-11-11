@@ -5,6 +5,8 @@ class VMDisk
 
     [string] $Path
 
+    [string] $DiskName = ([System.IO.FileInfo]$this.Path).BaseName
+
     [ValidateRange(0, 500GB)]
     [long] $SizeInBytes = 0
 
