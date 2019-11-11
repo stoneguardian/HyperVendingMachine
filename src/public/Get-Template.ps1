@@ -13,7 +13,7 @@ function Get-Template
     
     process
     {
-        (Get-ChildItem -Path $moduleConfig.TemplatePath -Filter '*.psd1').BaseName # Write-Output
+        (Get-ChildItem -Path $moduleConfig.TemplateBasePath -Filter '*.psd1').BaseName # Write-Output
     }
     
     end
