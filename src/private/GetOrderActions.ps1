@@ -70,6 +70,32 @@ function GetOrderActions
                     Parameters = $commonFunctionParams['Set-VM']
                 })
 
+            # TODO: support static disks, support "templates"
+            if ($Order.ContainsKey('Disks'))
+            {
+                foreach ($disk in $Order['Disks'])
+                {
+                    $diskPath = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\$($disk['Name'])"
+                    
+                    $actions.Add(@{
+                            Command    = 'CreateVHDX'
+                            Parameters = @{
+                                Path      = $diskPath
+                                SizeBytes = $disk['Size']
+                                Dynamic   = $true
+                            }
+                        })
+                    
+                    $actions.Add(@{
+                            Command    = 'AddVHDXToVM'
+                            Parameters = @{
+                                VMName = $Order['VMName']
+                                Path   = $diskPath
+                            }
+                        })
+                }
+            }
+
             $actions.Add(@{
                     Command    = 'StartVM'
                     Parameters = @{ Name = $Order['VMName'] }
