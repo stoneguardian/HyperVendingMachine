@@ -72,6 +72,8 @@ function Invoke-Order
                 }
             }
         }
+
+        $actionPlan # Write-Output actions taken
     }
     
     end
