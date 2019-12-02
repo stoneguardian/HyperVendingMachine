@@ -17,6 +17,8 @@ function Invoke-Order
 
         foreach ($action in $ActionPlan)
         {
+            Write-Debug -Message $($action | ConvertTo-Json)
+
             $functionParams = $action.Parameters
 
             if ($action.Command -eq 'NewVM')
