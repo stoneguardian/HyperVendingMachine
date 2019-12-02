@@ -1,6 +1,6 @@
 function Invoke-Order
 {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = "High")]
     param (
         [Parameter(Mandatory)]
         [hashtable] $Order
@@ -19,12 +19,33 @@ function Invoke-Order
         {
             $functionParams = $action.Parameters
 
-            switch ($action.Command) 
+            if ($action.Command -eq 'NewVM')
             {
-                'NewVM' { New-VM @functionParams }
-                'SetVM' { Set-VM @functionParams }
-                'StopVM' { Stop-VM @functionParams }
-                'StartVM' { Start-VM @functionParams }
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Creating VM"))
+                {
+                    New-VM @functionParams
+                }
+            }
+            elseif ($action.Command -eq 'SetVM')
+            {
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Altering $($action.Parameters.Keys.Count - 1) properties on VM"))
+                {
+                    Set-VM @functionParams
+                }
+            }
+            elseif ($action.Command -eq 'StopVM')
+            {
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Stopping VM"))
+                {
+                    Stop-VM @functionParams
+                }
+            }
+            elseif ($action.Command -eq 'StartVM')
+            {
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Starting VM"))
+                {
+                    Start-VM @functionParams
+                }
             }
         }
     }
