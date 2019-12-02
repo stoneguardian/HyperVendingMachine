@@ -75,7 +75,7 @@ function GetOrderActions
             {
                 foreach ($disk in $Order['Disks'])
                 {
-                    $diskPath = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\$($disk['Name'])"
+                    $diskPath = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\$($disk['Name']).vhdx"
                     
                     $actions.Add(@{
                             Command    = 'CreateVHDX'
