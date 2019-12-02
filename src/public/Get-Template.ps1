@@ -16,7 +16,7 @@ function Get-Template
     
     process
     {
-        $templates = (Get-ChildItem -Path $moduleConfig.TemplateBasePath -Filter "$Name.psd1")
+        $templates = (Get-ChildItem -Path $moduleConfig.TemplateBasePath -Filter "$Name.yml")
 
         if ($ListAvailable)
         {
@@ -28,7 +28,8 @@ function Get-Template
             {
                 [PSCustomObject]@{
                     Name     = $file.BaseName
-                    Template = Import-PowerShellDataFile -Path $file.FullName
+                    Path     = $file.FullName
+                    Template = Get-Content -Path $file.FullName -Raw | ConvertFrom-Yaml
                 } # Write-Output
             }    
         }
