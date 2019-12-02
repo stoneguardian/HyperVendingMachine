@@ -50,6 +50,20 @@ function Invoke-Order
                     Start-VM @functionParams
                 }
             }
+            elseif ($action.Command -eq 'CreateVHDX')
+            {
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Creating Virtual Disk"))
+                {
+                    New-VHD @functionParams
+                }
+            }
+            elseif ($action.Command -eq 'AddVHDXToVM')
+            {
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Adding disk to VM: $($action.Parameters.Path)"))
+                {
+                    Add-VMHardDiskDrive @functionParams
+                }
+            }
         }
     }
     
