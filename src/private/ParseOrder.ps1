@@ -85,8 +85,8 @@ function ParseOrder
             if (($Order['Disks'] -is [string]) -or ($Order['Disks'] -is [int]) -or ($Order['Disks'] -is [long]))
             {
                 $Order['Disks'] = @(@{
-                    Size = $Order['Disks']
-                })
+                        Size = $Order['Disks']
+                    })
             }
 
             $_disks = foreach ($disk in @($Order['Disks']))
@@ -119,7 +119,17 @@ function ParseOrder
                 [hashtable]$disk # Write-Output
             }
 
-            $Order['Disks'] = @($_disks)
+            $_systemdiskCount = ($_disks).Where{ $_.System -eq $true }.Count
+            if ($_systemdiskCount -gt 1)
+            {
+                Write-Error -Message "Only one 'System' disk is permitted in an order, found $_systemdiskCount" -ErrorAction Stop
+            }
+
+            # Ensure 'System'-disk is first in output-list
+            $_systemDisk = @($_disks).Where{ $_.System -eq $true }
+            $_otherDisks = @($_disks).Where{ $_.System -ne $true }
+
+            $Order['Disks'] = @($_systemDisk + $_otherDisks)
         }
 
         $Order # Write-Output

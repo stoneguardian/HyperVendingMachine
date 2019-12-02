@@ -163,6 +163,42 @@ Describe 'ParseOrder' {
             $result.Disks.Count | Should -Be 1
         }
 
+        It 'Ensures system-disk is first element in array' {
+            $obj = @{
+                VMName = 'test'
+                Disks  = @(
+                    @{
+                        Size = 10GB
+                    }
+                    @{
+                        System = $true
+                        Size   = 10GB
+                    }
+                )
+            }
+
+            $result = $obj | ParseOrder
+            $result.Disks[0].System | Should -Be $true
+        }
+
+        It 'Throws if more than one system-disk is given' {
+            $obj = @{
+                VMName = 'test'
+                Disks  = @(
+                    @{
+                        System = $true
+                        Size   = 10GB
+                    }
+                    @{
+                        System = $true
+                        Size   = 10GB
+                    }
+                )
+            }
+
+            { $obj | ParseOrder } | Should -Throw "only one"
+        }
+
         It 'Is array - <case>' -TestCases $diskTestCases {
             param($obj)
             $result = $obj | ParseOrder
