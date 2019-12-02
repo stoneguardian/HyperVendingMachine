@@ -13,7 +13,8 @@ function Invoke-Order
     
     process
     {
-        $actionPlan = GetOrderActions -Order $Order
+        $parsedOrder = ParseOrder -Order $Order
+        $actionPlan = GetOrderActions -Order $parsedOrder
 
         foreach ($action in $ActionPlan)
         {
