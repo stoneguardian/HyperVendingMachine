@@ -179,9 +179,56 @@ function GetOrderActions
                         })
                 }
             }
+
+            # Disks
+            if ($Order.ContainsKey('Disks'))
+            {
+                $existingDisks = Get-VMHardDiskDrive -VMName $Order['VMName'] | Select-Object -ExpandProperty Path
+
+                foreach ($disk in $Order['Disks'])
+                {
+                    $diskPath = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\$($disk['Name']).vhdx"
+
+                    $_exist = $diskPath -in $existingDisks
+
+                    if ($_exist)
+                    {
+                        $existingDisk = Get-VHD -Path $diskPath
+
+                        if ($existingDisks.Size -lt $disk['Size'])
+                        {
+                            $actions.Add(@{
+                                    Command    = 'ExpandVHDX'
+                                    Parameters = @{
+                                        Path      = $diskPath
+                                        SizeBytes = $disk['Size']
+                                    }
+                                })
+                        }
+                    }
+                    else 
+                    {
+                        $actions.Add(@{
+                                Command    = 'CreateVHDX'
+                                Parameters = @{
+                                    Path      = $diskPath
+                                    SizeBytes = $disk['Size']
+                                    Dynamic   = $true
+                                }
+                            })
+                    
+                        $actions.Add(@{
+                                Command    = 'AddVHDXToVM'
+                                Parameters = @{
+                                    VMName = $Order['VMName']
+                                    Path   = $diskPath
+                                }
+                            })
+                    }
+                }
+            }
         }
 
-        # TODO: Disk
 
 
         $actions # Write-Output
