@@ -26,7 +26,7 @@ function GetOrderActions
         }
 
         # Create VM
-        #$VM = Get-VM -Name $Order -ErrorAction SilentlyContinue
+        $VM = Get-VM -Name $Order -ErrorAction SilentlyContinue
         $vmExists = $null -ne $VM 
 
         if (-not $vmExists)
