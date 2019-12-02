@@ -195,7 +195,7 @@ function GetOrderActions
                     {
                         $existingDisk = Get-VHD -Path $diskPath
 
-                        if ($existingDisks.Size -lt $disk['Size'])
+                        if ($existingDisk.Size -lt $disk['Size'])
                         {
                             $actions.Add(@{
                                     Command    = 'ExpandVHDX'
