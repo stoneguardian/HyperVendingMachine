@@ -66,6 +66,11 @@ function GetOrderActions
                     Command    = 'SetVM'
                     Parameters = $commonFunctionParams['Set-VM']
                 })
+
+            $actions.Add(@{
+                    Command    = 'StartVM'
+                    Parameters = @{ Name = $Order['VMName'] }
+                })
         }
         else 
         {
