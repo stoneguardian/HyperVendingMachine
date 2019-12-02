@@ -47,8 +47,6 @@ function GetOrderActions
             $commonFunctionParams['Set-VM'] = @{
                 Name                 = $Order['VMName']
                 ProcessorCount       = $Order['CPUs']
-                MemoryMaximumBytes   = $Order.Memory.Max
-                MemoryMinimumBytes   = $Order.Memory.Min
                 
                 # Defaults
                 AutomaticStartAction = 'Start'
@@ -56,10 +54,15 @@ function GetOrderActions
                 AutomaticStopAction  = 'Save'
             }
 
-            switch ($Order.Memory.Dynamic)
+            if ($Order.Memory.Dynamic)
             {
-                $true { $commonFunctionParams['Set-VM']['DynamicMemory'] = $true }
-                $false { $commonFunctionParams['Set-VM']['StaticMemory'] = $true }
+                $commonFunctionParams['Set-VM']['DynamicMemory'] = $true
+                $commonFunctionParams['Set-VM']['MemoryMaximumBytes'] = $Order.Memory.Max
+                $commonFunctionParams['Set-VM']['MemoryMinimumBytes'] = $Order.Memory.Min
+            }
+            else 
+            {
+                $commonFunctionParams['Set-VM']['StaticMemory'] = $true 
             }
 
             $actions.Add(@{
