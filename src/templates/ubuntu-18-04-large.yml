@@ -1,0 +1,13 @@
+---
+#VMName: Required
+CPUs: 4
+Memory:
+  Dynamic: True
+  Boot: 2GB
+  Min: 1GB
+  Max: 4GB
+Disks:
+  - System: true
+    Size: 20GB
+  - Name: Data
+    Size: 60GB

@@ -1,0 +1,7 @@
+---
+#VMName: <required>
+CPUs: 1
+Memory: 512MB
+Disks:
+  - System: true
+    Size: 10GB
