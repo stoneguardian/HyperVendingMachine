@@ -67,7 +67,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'ExpandVHDX')
             {
-                if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Expand Virtual Disk to: $($action.Parameters.Path.SizeBytes / 1GB)GB"))
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Expand Virtual Disk to: $($action.Parameters.SizeBytes / 1GB)GB"))
                 {
                     Resize-VHD @functionParams
                 }
