@@ -79,6 +79,10 @@ function ParseOrder
         {
             $Order = $Order | ParseMemory
         }
+        else 
+        {
+            Write-Error -Message "Must contain key 'Memory'" -ErrorAction Stop
+        }
 
         if ($Order.ContainsKey('Disks'))
         {
