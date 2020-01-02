@@ -226,4 +226,24 @@ Describe 'ParseOrder' {
             }
         }
     }
+
+    Context 'Image' {
+        It 'Ensures .Image is "None" if no key specified' {
+            $result = @{
+                VMName = 'test'
+            } | ParseOrder
+
+            $result.Image | Should -Be 'None'
+        }
+
+        It 'Passes thru value if Image-key is given' {
+            $result = @{
+                VMName = 'test'
+                Image  = 'Ubuntu/Bionic'
+            } | ParseOrder
+
+            $result.Image | Should -Be 'Ubuntu/Bionic'
+        }
+    }
+
 }

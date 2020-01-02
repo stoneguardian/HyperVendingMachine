@@ -10,4 +10,5 @@
     VMStoragePath        = 'D:\HyperVendingMachine\VMs'
     OrderBasePath        = 'D:\HyperVendingMachine\Orders'
     TemplateBasePath     = 'D:\HyperVendingMachine\Templates'
+    ImageStoragePath     = 'D:\HyperVendingMachine\Image'
 }

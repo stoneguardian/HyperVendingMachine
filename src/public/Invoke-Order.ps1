@@ -72,6 +72,22 @@ function Invoke-Order
                     Resize-VHD @functionParams
                 }
             }
+            elseif ($action.Command -eq 'CopyImage')
+            {
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Destination, "Create system-disk using image-disk '$($action.Parameters.ImageDisk)'"))
+                {
+                    if (-not (Test-Path $action.Parameters.ImageDisk))
+                    {
+                        Write-Error -Message "Unable to find file: $($action.Parameters.ImageDisk), please specify a valid Image" -ErrorAction Stop
+                    }
+
+                    $destinationContainer = $action.Parameters.Destination.Directory
+                    $copyFileName = $action.Parameters.ImageDisk.Name
+
+                    Copy-Item -Path $action.Parameters.ImageDisk.FullName -Destination $destinationContainer
+                    Rename-Item -Path "$($destinationContainer.FullName)\$copyFileName" -NewName "$($action.Parameters.Destination.Name)"
+                }
+            }
         }
 
         $actionPlan # Write-Output actions taken

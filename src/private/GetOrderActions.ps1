@@ -12,8 +12,6 @@ function GetOrderActions
         $shutdownRequired = $false
         $vmExists = $false
 
-        
-
         $actions = [System.Collections.Generic.List[hashtable]]::new()
     }
     
@@ -76,15 +74,36 @@ function GetOrderActions
                 foreach ($disk in $Order['Disks'])
                 {
                     $diskPath = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\$($disk['Name']).vhdx"
-                    
-                    $actions.Add(@{
-                            Command    = 'CreateVHDX'
-                            Parameters = @{
-                                Path      = $diskPath
-                                SizeBytes = $disk['Size']
-                                Dynamic   = $true
-                            }
-                        })
+
+                    if (($disk.System) -and ($Order['Image'] -ne 'None'))
+                    {
+                        $actions.Add(@{
+                                Command    = 'CopyImage'
+                                Parameters = @{
+                                    ImageDisk   = [System.IO.FileInfo]"$($moduleConfiguration['ImageStoragePath'])\$($Order['Image']).vhdx"
+                                    Destination = [System.IO.FileInfo]$diskPath
+                                }
+                            })
+
+                        $actions.Add(@{
+                                Command    = 'ExpandVHDX'
+                                Parameters = @{
+                                    Path      = $diskPath
+                                    SizeBytes = $disk['Size']
+                                }
+                            })
+                    }
+                    else 
+                    {
+                        $actions.Add(@{
+                                Command    = 'CreateVHDX'
+                                Parameters = @{
+                                    Path      = $diskPath
+                                    SizeBytes = $disk['Size']
+                                    Dynamic   = $true
+                                }
+                            })
+                    }
                     
                     $actions.Add(@{
                             Command    = 'AddVHDXToVM'

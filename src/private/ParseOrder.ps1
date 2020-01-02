@@ -132,6 +132,11 @@ function ParseOrder
             $Order['Disks'] = @($_systemDisk + $_otherDisks)
         }
 
+        if (-not ($Order.ContainsKey('Image')))
+        {
+            $Order['Image'] = 'None'
+        }
+
         $Order # Write-Output
     }
     
