@@ -68,7 +68,7 @@ function GetOrderActions
                     Parameters = $commonFunctionParams['Set-VM']
                 })
 
-            # TODO: support static disks, support "templates"
+            # TODO: support static disks
             if ($Order.ContainsKey('Disks'))
             {
                 foreach ($disk in $Order['Disks'])
@@ -245,6 +245,11 @@ function GetOrderActions
                             })
                     }
                 }
+            }
+
+            if ($Order['CI_UserData'].Keys.Count -gt 0)
+            {
+                Write-Warning 'cloud-init UserData will not be updated after the VM is created'
             }
         }
 
