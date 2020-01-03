@@ -115,6 +115,39 @@ function GetOrderActions
                 }
             }
 
+            # cloud-init
+            if (-not (Test-Path $moduleConfiguration['Tools']['OSCDimgPath']))
+            {
+                Write-Error -Message "'OSCDimg' is required to create cloud-init ISO-image" -ErrorAction Stop
+            }
+
+            $ci_metadata = @"
+instance_id = $([Guid]::NewGuid())
+local-hostname = $($Order['VMName'])
+"@
+
+            $ci_userdata = RenderCloudInitUserData -VMName $Order['VMName'] -Domain $Order['Domain'] -UserData $Order['UserData']
+            
+            $actions.Add(@{
+                    Command    = 'CreateCloudInitDisk'
+                    Parameters = @{
+                        MetaData    = $ci_metadata
+                        UserData    = $ci_userdata
+                        StoragePath = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])"
+                        OSCDimgPath = $moduleConfiguration['Tools']['OSCDimgPath']
+                    }
+                })
+
+            $actions.Add(@{
+                    Command    = 'SetDiskISO'
+                    Parameters = @{
+                        Name = $Order['VMName']
+                        Path = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\cloud-init.iso"
+                    }
+                })
+
+            # TODO: Network Interface
+
             $actions.Add(@{
                     Command    = 'StartVM'
                     Parameters = @{ Name = $Order['VMName'] }

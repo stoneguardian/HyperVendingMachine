@@ -88,7 +88,43 @@ function Invoke-Order
                     Rename-Item -Path "$($destinationContainer.FullName)\$copyFileName" -NewName "$($action.Parameters.Destination.Name)"
                 }
             }
+            elseif ($action.Command -eq 'CreateCloudInitDisk')
+            {
+                $_tempfolder = "$($action.Parameters.StoragePath)\cloud-init-files"
+                $_isopath = "$($action.Parameters.StoragePath)\cloud-init.iso"
+
+                if ($PSCmdlet.ShouldProcess($_isopath, "Create cloud-init-disk"))
+                {
+                    if (-not (Test-Path $_tempfolder))
+                    {
+                        New-Item -Path $_tempfolder -ItemType Directory
+                    }
+
+                    if (Test-Path $_isopath)
+                    {
+                        Remove-Item -Path $_isopath -Force
+                    }
+
+                    Set-Content -Path "$_tempfolder\meta-data" -Value ([byte[]][char[]] "$($action.Parameters.MetaData)") -Encoding Byte -Force
+                    Set-Content -Path "$_tempfolder\user-data" -Value ([byte[]][char[]] "$($action.Parameters.UserData)") -Encoding Byte -Force
+
+                    & ($action.Parameters.OSCDimgPath) "$_tempfolder" "$_isopath" -j2 -lcidata
+                }
+            }
+            elseif ($action.Command -eq 'SetDiskISO')
+            {
+                Parameters = @{
+                    Name = $Order['VMName']
+                    Path = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\cloud-init.iso"
+                }
+
+                if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Set disk for VM '$($action.Parameters.Path)'"))
+                {
+                    Set-VMDvdDrive -VMName $action.Parameters.Name -Path $action.Parameters.Path
+                }                
+            }
         }
+    
 
         $actionPlan # Write-Output actions taken
     }
