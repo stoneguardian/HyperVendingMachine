@@ -146,6 +146,11 @@ function ParseOrder
             $Order['CI_UserData'] = @{ }
         }
 
+        if (-not ($Order.ContainsKey('Domain')))
+        {
+            $Order['Domain'] = [string]::Empty
+        }
+
         $Order # Write-Output
     }
     
