@@ -33,7 +33,7 @@ function GetOrderActions
                 Name               = $Order['VMName']
                 MemoryStartupBytes = $Order['Memory']['Boot']
                 Path               = $moduleConfiguration['VMStoragePath']
-                Generation         = 2
+                Generation         = 1
                 NoVHD              = $true
             }
 
