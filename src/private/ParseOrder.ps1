@@ -8,7 +8,7 @@ function ParseOrder
     
     begin
     {
-        $MandatoryKeys = @('VMName')
+        $MandatoryKeys = @('VMName', 'CPUs')
 
         function ParseMemory
         {
