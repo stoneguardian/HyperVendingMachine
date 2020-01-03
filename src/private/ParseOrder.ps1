@@ -141,6 +141,11 @@ function ParseOrder
             $Order['Image'] = 'None'
         }
 
+        if (-not ($Order.ContainsKey('CI_UserData')))
+        {
+            $Order['CI_UserData'] = @{ }
+        }
+
         $Order # Write-Output
     }
     
