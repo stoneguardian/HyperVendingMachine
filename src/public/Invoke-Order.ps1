@@ -27,7 +27,7 @@ function Invoke-Order
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Creating VM"))
                 {
                     New-VM @functionParams
-                    Set-VMFirmware -VMName $functionParams.Name -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
+                    #Set-VMFirmware -VMName $functionParams.Name -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
                 }
             }
             elseif ($action.Command -eq 'SetVM')
