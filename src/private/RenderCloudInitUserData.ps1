@@ -39,9 +39,11 @@ function RenderCloudInitUserData
 
         # List of keys not in the module configuration-defaults
         $keysToAdd = $UserData.Keys.Where{ $_ -notin $out_userData.Keys }
+        Write-Debug "keysToAdd: $($keysToAdd -join ',')"
 
         # List of keys that exist in the module configuration-defaults, and that are not on the blacklist
         $keysToUpdate = $UserData.Keys.Where{ ($_ -notin $keysToAdd) -and ($_ -notin $_keyBlacklist) }
+        Write-Debug "keysToUpdate: $($keysToUpdate -join ',')"
 
         foreach ($key in $keysToAdd)
         {
