@@ -122,8 +122,8 @@ function GetOrderActions
             }
 
             $ci_metadata = @"
-instance_id = 'iid-12345'
-local-hostname = $($Order['VMName'])
+instance_id: 'iid-12345'
+local-hostname: $($Order['VMName'])
 "@
 
             $ci_userdata = RenderCloudInitUserData -VMName $Order['VMName'] -Domain $Order['Domain'] -UserData $Order['UserData']
