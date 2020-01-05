@@ -126,7 +126,7 @@ instance_id: iid-12345
 local-hostname: $($Order['VMName'].ToLower())
 "@
 
-            $ci_userdata = RenderCloudInitUserData -VMName $Order['VMName'] -Domain $Order['Domain'] -UserData $Order['UserData']
+            $ci_userdata = RenderCloudInitUserData -VMName $Order['VMName'] -Domain $Order['Domain'] -UserData $Order['CI_UserData']
             
             $actions.Add(@{
                     Command    = 'CreateCloudInitDisk'
