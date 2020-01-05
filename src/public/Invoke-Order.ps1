@@ -48,7 +48,7 @@ function Invoke-Order
             {
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Starting VM"))
                 {
-                    #Start-VM @functionParams
+                    Start-VM @functionParams
                 }
             }
             elseif ($action.Command -eq 'CreateVHDX')
