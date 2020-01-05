@@ -34,4 +34,7 @@ hv_netvsc
             }
         }
     }
+    Tools                = @{
+        oscdimgPath = 'D:\HyperVendingMachine\Tools\oscdimg\oscdimg.exe'
+    }
 }
