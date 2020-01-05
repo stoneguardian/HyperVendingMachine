@@ -113,15 +113,26 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'SetDiskISO')
             {
-                Parameters = @{
-                    Name = $Order['VMName']
-                    Path = "$($moduleConfiguration['VMStoragePath'])\$($Order['VMName'])\cloud-init.iso"
-                }
-
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Set disk for VM '$($action.Parameters.Path)'"))
                 {
                     Set-VMDvdDrive -VMName $action.Parameters.Name -Path $action.Parameters.Path
                 }                
+            }
+            elseif ($action.Command -eq 'AddNetAdapter')
+            {
+                if ($PSCmdlet.ShouldProcess('Network Adapter', "Recreating network adapter for VM: '$($action.Parameters.Path)'"))
+                {                        
+                    $existingAdapter = Get-VMNetworkAdapter -VMName $action.Parameters.VMName
+                    $existingAdapter | Remove-VMNetworkAdapter
+
+                    Add-VMNetworkAdapter -VMName $action.Parameters.VMName -SwitchName $action.Parameters.Switch
+                                       
+                    if ($action.Parameters.Vlan -ne $false)
+                    {
+                        $newAdapter = Get-VMNetworkAdapter -VMName $action.Parameters.VMName
+                        $newAdapter | Set-VMNetworkAdapterVlan -VlanId $action.Parameters.Vlan -Access
+                    }
+                }
             }
         }
     

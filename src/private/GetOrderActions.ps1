@@ -146,7 +146,15 @@ local-hostname = $($Order['VMName'])
                     }
                 })
 
-            # TODO: Network Interface
+            if ($Order.ContainsKey('Network'))
+            {
+                $Order['Network']['VMName'] = $Order['VMName']
+
+                $actions.Add(@{
+                        Command    = 'AddNetAdapter'
+                        Parameters = $Order['Network']
+                    })
+            }
 
             $actions.Add(@{
                     Command    = 'StartVM'
@@ -283,6 +291,22 @@ local-hostname = $($Order['VMName'])
             if ($Order['CI_UserData'].Keys.Count -gt 0)
             {
                 Write-Warning 'cloud-init UserData will not be updated after the VM is created'
+            }
+
+            if ($Order.ContainsKey('Network'))
+            {
+                Write-Warning 'Adding network adapter after VM is created is not currently supported'
+
+                # Adding network adapter requires shutdown
+                <#
+                if ($Order.ContainsKey('Network'))
+                {
+                    $actions.Add(@{
+                            Command    = 'AddNetAdapter'
+                            Parameters = $Order['Network']
+                        })
+                }
+                #>
             }
         }
 

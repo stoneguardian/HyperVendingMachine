@@ -246,4 +246,38 @@ Describe 'ParseOrder' {
         }
     }
 
+    Context 'Network' {
+        It 'Converts string to Switch with no VLAN set' {
+            $result = @{
+                VMName  = 'Test'
+                Network = 'Switch-Name'
+            } | ParseOrder
+
+            $result.Network.Switch | Should -Be 'Switch-Name'
+            $result.Network.Vlan | Should -Be $false
+        }
+
+        It 'Adds missing VLAN property' {
+            $result = @{
+                VMName  = 'Test'
+                Network = @{
+                    Switch = 'Switch-Name'
+                }
+            } | ParseOrder
+
+            $result.Network.Switch | Should -Be 'Switch-Name'
+            $result.Network.Vlan | Should -Be $false
+        }
+
+        It 'Errors if no switch is given' {
+            $testInput = @{
+                VMName  = 'Test'
+                Network = @{
+                    Vlan = 10
+                }
+            }
+
+            { $testInput | ParseOrder } | Should -Throw 'missing'
+        }
+    }
 }
