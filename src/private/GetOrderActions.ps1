@@ -123,7 +123,7 @@ function GetOrderActions
 
             $ci_metadata = @"
 instance_id: iid-12345
-local-hostname: $($Order['VMName'])
+local-hostname: $($Order['VMName'].ToLower())
 "@
 
             $ci_userdata = RenderCloudInitUserData -VMName $Order['VMName'] -Domain $Order['Domain'] -UserData $Order['UserData']
