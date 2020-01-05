@@ -62,7 +62,12 @@ function RenderCloudInitUserData
             }
         }
 
-        [string]"$($out_userData | ConvertTo-Json -Depth 10)"
+        # Do not remove '#cloud-config'...
+        @"
+$('#cloud-config')
+$($out_userData | ConvertTo-Yaml)
+"@ # Write-Output 
+        
     }
     
     end
