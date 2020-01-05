@@ -62,7 +62,7 @@ function RenderCloudInitUserData
             }
         }
 
-        $out_userData | ConvertTo-Yaml
+        $out_userData | ConvertTo-Json -Depth 10
     }
     
     end
