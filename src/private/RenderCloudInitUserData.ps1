@@ -26,15 +26,15 @@ function RenderCloudInitUserData
     {
         $out_userData = $ModuleConfigUserData
 
-        $out_userData['hostname'] = $VMName
+        $out_userData['hostname'] = $VMName.ToLower()
 
         if ([string]::IsNullOrEmpty($Domain))
         {
-            $out_userData['fqdn'] = $VMName
+            $out_userData['fqdn'] = $VMName.ToLower()
         }
         else
         {
-            $out_userData['fqdn'] = "$VMName.$Domain"
+            $out_userData['fqdn'] = "$($VMName.ToLower()).$($Domain.ToLower())"
         }
 
         # List of keys not in the module configuration-defaults
