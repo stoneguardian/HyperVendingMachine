@@ -62,7 +62,7 @@ function RenderCloudInitUserData
             }
         }
 
-        $out_userData | ConvertTo-Json -Depth 10
+        [string]"$($out_userData | ConvertTo-Json -Depth 10)"
     }
     
     end
