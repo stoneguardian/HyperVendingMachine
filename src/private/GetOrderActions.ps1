@@ -122,7 +122,7 @@ function GetOrderActions
             }
 
             $ci_metadata = @"
-instance_id = $([Guid]::NewGuid())
+instance_id = 'iid-12345'
 local-hostname = $($Order['VMName'])
 "@
 
