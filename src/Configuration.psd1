@@ -18,8 +18,8 @@
         UserData = @{
             timezone        = "Europe/Oslo"
             package_upgrade = $true
-            packages        = [System.Collections.Generic.List[string]]@('linux-virtual', 'linux-cloud-tools-virtual', 'linux-tools-virtual')
-            write_files     = [System.Collections.Generic.List[hashtable]]@(@{
+            packages        = @('linux-virtual', 'linux-cloud-tools-virtual', 'linux-tools-virtual')
+            write_files     = @(@{
                     content = @"
 hv_vmbus
 hv_storvsc
