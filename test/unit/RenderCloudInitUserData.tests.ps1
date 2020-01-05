@@ -13,6 +13,11 @@ Describe 'RenderCloudInitUserData' {
         $result | Should -BeLike "*fqdn: test.somedomain.local*"
     }
 
+    It 'Has "#cloud-config" as first line of output' {
+        $result = RenderCloudInitUserData -VMName 'test' -ModuleConfigUserData @{ }
+        $result | Should -BeLike '#cloud-config*'
+    }
+
     It 'Does not allow overwriting keys on blacklist' {
         $result = RenderCloudInitUserData -VMName 'test' -UserData @{ hostname = 'something' } -ModuleConfigUserData @{ }
         $result | Should -BeLike "*hostname: test*"
@@ -21,6 +26,15 @@ Describe 'RenderCloudInitUserData' {
     It 'Adds keys if not in config-UserData' {
         $result = RenderCloudInitUserData -VMName 'test' -UserData @{ nonexisting = 'something' } -ModuleConfigUserData @{ }
         $result | Should -BeLike '*nonexisting: something*'
+    }
+
+    It 'Adds complex key' {
+        $result = RenderCloudInitUserData -VMName 'test' -UserData @{ users = @(@{ name = 'test'; groups = 'adm', 'sudo' }) } -ModuleConfigUserData @{ }
+        $result | Should -BeLike '*users:*'
+        $result | Should -BeLike '*name: test*'
+        $result | Should -BeLike '*groups:*'
+        $result | Should -BeLike '*- adm*'
+        $result | Should -BeLike '*- sudo*'
     }
 
     It 'Adds keys on blacklist if not in config-UserData' {
