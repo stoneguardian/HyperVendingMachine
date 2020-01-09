@@ -1,10 +1,29 @@
 # Load required files
 . $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
+. $PSScriptRoot\..\..\src\classes\VMParserDisk.ps1
 . $PSScriptRoot\..\..\src\private\ParseOrder.ps1
 
 
 # ParseOrder
 Describe 'ParseOrder' {
+    # Mock Get-VM if command is available
+    if ($null -ne (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
+    {
+        Mock -CommandName 'Get-VM' -MockWith {
+            return $null
+        }
+    }
+    else 
+    {
+        function Get-VM
+        {
+            [CmdletBinding()]
+            param([string] $Name)
+        
+            return $null
+        }    
+    }
+
     Context 'Memory' {
         $memTestCases = @(
             @{ 
