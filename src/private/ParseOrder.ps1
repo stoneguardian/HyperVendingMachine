@@ -9,62 +9,6 @@ function ParseOrder
     begin
     {
         $MandatoryKeys = @('VMName')
-
-        function ParseMemory
-        {
-            [Parameter(Mandatory, ValueFromPipeline)]
-            [hashtable] $Order
-
-            $mandatoryKeys = @('Dynamic', 'Boot')
-            $outputKeys = $mandatoryKeys + @('Min', 'Max')
-
-            if ($Order['Memory'] -isnot [hashtable])
-            {
-                $Order['Memory'] = @{
-                    Dynamic = $false
-                    Boot    = $Order['Memory']
-                }
-            }
-
-            $memoryMissingMandatoryKeys = @('Dynamic', 'Boot').Where{ $_ -notin $Order['Memory'].Keys }
-            if ($memoryMissingMandatoryKeys.Count -ne 0)
-            {
-                Write-Error -Message "Missing required memory-information: `n - $($memoryMissingMandatoryKeys -join "`n - ")" -ErrorAction Stop
-            }
-            
-            if ($Order['Memory']['Boot'] -isnot [long])
-            {
-                $Order['Memory']['Boot'] = [long]$Order['Memory']['Boot']
-            }
-
-            # "Autocomplete" missing properties or ensure correct type
-            if (-not $Order['Memory'].ContainsKey('Min'))
-            {
-                # Default to half of boot-memory
-                $Order['Memory']['Min'] = $Order['Memory']['Boot'] / 2
-            }
-            elseif ($Order['Memory']['Min'] -isnot [long])
-            {
-                $Order['Memory']['Min'] = [long]$Order['Memory']['Min']
-            }
-
-            if (-not $Order['Memory'].ContainsKey('Max'))
-            {
-                # Default to twice of boot-memory
-                $Order['Memory']['Max'] = $Order['Memory']['Boot'] * 2
-            }
-            elseif ($Order['Memory']['Max'] -isnot [long])
-            {
-                $Order['Memory']['Max'] = [long]$Order['Memory']['Max']
-            }
-
-            $extraKeys = $Order['Memory'].Keys.Where{ $_ -notin $outputKeys }
-
-            foreach ($key in $extraKeys)
-            {
-                $Order['Memory'].Remove($key)
-            }
-        }
     }
     
     process
@@ -77,7 +21,7 @@ function ParseOrder
 
         if ($Order.ContainsKey('Memory'))
         {
-            $Order = $Order | ParseMemory
+            $Order['Memory'] = [VMParserMemory]::new($Order['Memory']).ToHashtable()
         }
 
         if ($Order.ContainsKey('Disks'))

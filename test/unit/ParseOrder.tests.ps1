@@ -1,4 +1,7 @@
+# Load required files
+. $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
 . $PSScriptRoot\..\..\src\private\ParseOrder.ps1
+
 
 # ParseOrder
 Describe 'ParseOrder' {
@@ -69,19 +72,17 @@ Describe 'ParseOrder' {
             $result.Memory | Should -BeOfType [hashtable]
         }
 
-        $memoryKeys = @('Dynamic', 'Boot', 'Min', 'Max')
-
         It 'Adds missing properties - <case>' -TestCases $memTestCases {
             param($obj)
             $result = $obj | ParseOrder
-            $missingKeys = $memoryKeys.Where{ $_ -notin $result.Memory.Keys }
+            $missingKeys = [VMParserMemory]::OutputKeys.Where{ $_ -notin $result.Memory.Keys }
             $missingKeys -join ', ' | Should -BeNullOrEmpty
         }
 
         It 'Removes unknown keys - <case>' -TestCases $memTestCases {
             param($obj)
             $result = $obj | ParseOrder
-            $missingKeys = $result.Memory.Keys.Where{ $_ -notin $memoryKeys }
+            $missingKeys = $result.Memory.Keys.Where{ $_ -notin [VMParserMemory]::OutputKeys }
             $missingKeys -join ', ' | Should -BeNullOrEmpty
         }
 
