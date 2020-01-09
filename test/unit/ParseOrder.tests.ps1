@@ -98,13 +98,6 @@ Describe 'ParseOrder' {
             $missingKeys -join ', ' | Should -BeNullOrEmpty
         }
 
-        It 'Removes unknown keys - <case>' -TestCases $memTestCases {
-            param($obj)
-            $result = $obj | ParseOrder
-            $missingKeys = $result.Memory.Keys.Where{ $_ -notin [VMParserMemory]::OutputMap.Keys }
-            $missingKeys -join ', ' | Should -BeNullOrEmpty
-        }
-
         It 'Ensures numbers are [long] - <case>' -TestCases $memTestCases {
             param($obj)
             $result = $obj | ParseOrder
