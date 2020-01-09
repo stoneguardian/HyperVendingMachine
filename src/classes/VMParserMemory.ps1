@@ -1,7 +1,12 @@
 class VMParserMemory
 {
     hidden [hashtable] $workingObject
-    static [string[]] $OutputKeys = @('Dynamic', 'Boot', 'Min', 'Max')
+    static [hashtable] $OutputMap = @{
+        Dynamic = [bool]
+        Boot    = [long]
+        Min     = [long]
+        Max     = [long]
+    }
 
     # Expand input like
     # @{
@@ -13,17 +18,17 @@ class VMParserMemory
             Dynamic = $false
             Boot    = $order
         }
-        $this.SharedConstructor()
+        $this.CommonConstructor()
     }
 
     VMParserMemory([hashtable] $order)
     {
         $this.workingObject = $order
         $this.ValidateMandatoryKeys()
-        $this.SharedConstructor()
+        $this.CommonConstructor()
     }
 
-    hidden [void] SharedConstructor()
+    hidden [void] CommonConstructor()
     {
         $this.EnsureKeyIsLong('Boot')
         $this.AddMinIfMissing()
@@ -86,9 +91,9 @@ class VMParserMemory
         }
     }
 
-    [hashtable]ToHashtable()
+    [hashtable]Build()
     {
-        $missingKeys = $this.OutputKeys.Where{ $_ -notin $this.workingObject.Keys }
+        $missingKeys = $this.OutputMap.Keys.Where{ $_ -notin $this.workingObject.Keys }
 
         if ($missingKeys.Count -gt 0)
         {

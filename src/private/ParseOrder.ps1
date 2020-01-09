@@ -21,7 +21,7 @@ function ParseOrder
 
         if ($Order.ContainsKey('Memory'))
         {
-            $Order['Memory'] = [VMParserMemory]::new($Order['Memory']).ToHashtable()
+            $Order['Memory'] = [VMParserMemory]::new($Order['Memory']).Build()
         }
 
         if ($Order.ContainsKey('Disks'))

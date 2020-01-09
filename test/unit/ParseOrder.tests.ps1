@@ -94,14 +94,14 @@ Describe 'ParseOrder' {
         It 'Adds missing properties - <case>' -TestCases $memTestCases {
             param($obj)
             $result = $obj | ParseOrder
-            $missingKeys = [VMParserMemory]::OutputKeys.Where{ $_ -notin $result.Memory.Keys }
+            $missingKeys = [VMParserMemory]::OutputMap.Keys.Where{ $_ -notin $result.Memory.Keys }
             $missingKeys -join ', ' | Should -BeNullOrEmpty
         }
 
         It 'Removes unknown keys - <case>' -TestCases $memTestCases {
             param($obj)
             $result = $obj | ParseOrder
-            $missingKeys = $result.Memory.Keys.Where{ $_ -notin [VMParserMemory]::OutputKeys }
+            $missingKeys = $result.Memory.Keys.Where{ $_ -notin [VMParserMemory]::OutputMap.Keys }
             $missingKeys -join ', ' | Should -BeNullOrEmpty
         }
 

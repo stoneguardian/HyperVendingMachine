@@ -28,16 +28,18 @@ Describe 'Class: VMParserMemory' {
 
     It 'Generates "Min" and "Max"-keys if not given (<type>)' -TestCases $genTestCases {
         param($value)
-        $result = [VMParserMemory]::new($value).ToHashtable()
+        $result = [VMParserMemory]::new($value).Build()
         'Min' | Should -BeIn $result.Keys
         'Max' | Should -BeIn $result.Keys
     }
 
-    It 'Ensures number-values are of type [long]' {
-        $result = [VMParserMemory]::new('1GB').ToHashtable()
-        $result.Boot | Should -BeOfType [long]
-        $result.Min | Should -BeOfType [long]
-        $result.Max | Should -BeOfType [long]
+    $outputTypeTestCases = [VMParserMemory]::OutputMap.Keys | 
+        ForEach-Object { @{ Key = $_; Type = [VMParserMemory]::OutputMap[$_] } }
+
+    It "Ensures key '<Key>' is of type <Type>" -TestCases $outputTypeTestCases {
+        param($Key, $Type)
+        $result = [VMParserMemory]::new('1GB').Build()
+        $result[$Key] | Should -BeOfType $Type
     }
 
     It 'Ensures "Max" is not less than "Boot"' {
@@ -46,7 +48,7 @@ Describe 'Class: VMParserMemory' {
             Boot    = 1GB
             Max     = 512MB
         }
-        $result = [VMParserMemory]::new($order).ToHashtable()
+        $result = [VMParserMemory]::new($order).Build()
         $result.Max | Should -Be $order.Boot
     }
 
@@ -56,7 +58,7 @@ Describe 'Class: VMParserMemory' {
             Boot    = 1GB
             Min     = 2GB
         }
-        $result = [VMParserMemory]::new($order).ToHashtable()
+        $result = [VMParserMemory]::new($order).Build()
         $result.Min | Should -Be $order.Boot
     }
 }
