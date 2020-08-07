@@ -1,4 +1,5 @@
 # Load required files
+. $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
 . $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
 
 # Silence warning-output
