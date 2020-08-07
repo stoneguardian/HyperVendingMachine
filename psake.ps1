@@ -29,7 +29,6 @@ Task CopyItems -depends 'Init' {
 
 Task BuildPSM1 -depends 'Init' {
     "# `n# Commit: $(git rev-parse HEAD) " | Out-File -FilePath $PSM1Path -Encoding utf8
-    "# File generated: $(Get-Date -Format u) `n#" | Out-File -FilePath $PSM1Path -Append -Encoding utf8
     
     if (Test-Path "$SourcePath/classes")
     {
@@ -80,4 +79,15 @@ Task BuildPSM1 -depends 'Init' {
     }
 }
 
-Task Build -depends 'CopyItems', 'BuildPSM1'
+Task BuildPSD1 -depends 'CopyItems' {
+    $publicFunctions = Get-ChildItem -Path "$SourcePath/public" -Filter '*.ps1'
+
+    $updateModuleManifestParams = @{
+        Path              = "$ReleasePath/$ModuleName.psd1"
+        FunctionsToExport = $publicFunctions.BaseName
+    }
+
+    Update-ModuleManifest @updateModuleManifestParams
+}
+
+Task Build -depends 'BuildPSM1', 'BuildPSD1'
