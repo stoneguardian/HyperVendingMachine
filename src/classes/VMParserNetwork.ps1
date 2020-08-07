@@ -14,12 +14,12 @@ class VMParserNetwork : VMParserBase
     VMParserNetwork([hashtable] $order)
     {
         $this.workingObject = $order
+        $this.CheckForRequiredKeys('Switch')
         $this.CommonConstructor()
     }
 
     hidden [void] CommonConstructor() 
     {
-        $this.ErrorIfKeyIsMissing('Switch')
         $this.AddDefaultValueIfMissing('Vlan', $false)
         $this.CheckOutputForMissingKeys([VMParserNetwork]::OutputMap)
         $this.CheckOutputTypes([VMParserNetwork]::OutputMap)
