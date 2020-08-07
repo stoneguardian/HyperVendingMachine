@@ -1,6 +1,8 @@
 # Load required files
+. $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
 . $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
 . $PSScriptRoot\..\..\src\classes\VMParserDisk.ps1
+. $PSScriptRoot\..\..\src\classes\VMParserNetwork.ps1
 . $PSScriptRoot\..\..\src\private\ParseOrder.ps1
 
 
@@ -290,7 +292,7 @@ Describe 'ParseOrder' {
                 }
             }
 
-            { $testInput | ParseOrder } | Should -Throw 'missing'
+            { $testInput | ParseOrder } | Should -Throw 'Switch'
         }
     }
 }
