@@ -129,7 +129,7 @@ class VMParserSingleDisk : VMParserBase
         $this.AddDefaultValueIfMissing('Name', [Guid]::NewGuid().ToString())
         $this.AddDefaultValueIfMissing('System', $false)
         $this.CheckOutputForMissingKeys([VMParserSingleDisk]::OutputMap)
-        $this.CheckOutputType([VMParserSingleDisk]::OutputMap)
+        $this.CheckOutputTypes([VMParserSingleDisk]::OutputMap)
     }
 
     # Builder-pattern
@@ -138,7 +138,7 @@ class VMParserSingleDisk : VMParserBase
         $this.workingObject['System'] = $true
         $this.workingObject['Name'] = $VMName
         $this.CheckOutputForMissingKeys([VMParserSingleDisk]::OutputMap)
-        $this.CheckOutputType([VMParserSingleDisk]::OutputMap)
+        $this.CheckOutputTypes([VMParserSingleDisk]::OutputMap)
         return $this
     }
 }
