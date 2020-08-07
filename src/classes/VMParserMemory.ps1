@@ -1,6 +1,5 @@
-class VMParserMemory
+class VMParserMemory : VMParserBase
 {
-    hidden [hashtable] $workingObject
     static [hashtable] $OutputMap = @{
         Dynamic = [bool]
         Boot    = [long]
@@ -24,53 +23,20 @@ class VMParserMemory
     VMParserMemory([hashtable] $order)
     {
         $this.workingObject = $order
-        $this.ValidateMandatoryKeys()
+        $this.CheckForRequiredKeys(@('Dynamic', 'Boot'))
         $this.CommonConstructor()
     }
 
     hidden [void] CommonConstructor()
     {
-        $this.EnsureKeyIsLong('Boot')
-        $this.AddMinIfMissing()
-        $this.AddMaxIfMissing()
-        $this.EnsureKeyIsLong('Min')
-        $this.EnsureKeyIsLong('Max')
+        $this.EnsureKeyIsOfType('Boot', [VMParserMemory]::OutputMap['Boot'])
+        $this.AddDefaultValueIfMissing('Min', ($this.workingObject['Boot'] / 2))
+        $this.AddDefaultValueIfMissing('Max', ($this.workingObject['Boot'] * 2))
+        $this.EnsureKeyIsOfType('Min', [VMParserMemory]::OutputMap['Min'])
+        $this.EnsureKeyIsOfType('Max', [VMParserMemory]::OutputMap['Max'])
         $this.ValidateMinMax()
-    }
-
-    hidden [void] ValidateMandatoryKeys()
-    {
-        $missingMandatoryKeys = @('Dynamic', 'Boot').Where{ $_ -notin $this.workingObject.Keys }
-        if ($missingMandatoryKeys.Count -gt 0)
-        {
-            Write-Error -Message "Missing required input: `n - $($missingMandatoryKeys -join "`n - ")" -ErrorAction Stop
-        }
-    }
-
-    hidden [void] EnsureKeyIsLong([string] $key)
-    {
-        if ($this.workingObject[$key] -isnot [long])
-        {
-            $this.workingObject[$key] = [long]$this.workingObject[$key]
-        }
-    }
-
-    hidden [void] AddMinIfMissing()
-    {
-        if (-not ($this.workingObject.ContainsKey('Min')))
-        {
-            # If not set: default to half of boot
-            $this.workingObject['Min'] = $this.workingObject['Boot'] / 2
-        }
-    }
-
-    hidden [void] AddMaxIfMissing()
-    {
-        if (-not ($this.workingObject.ContainsKey('Max')))
-        {
-            # If not set: default to double of boot
-            $this.workingObject['Max'] = $this.workingObject['Boot'] * 2
-        }
+        $this.CheckOutputForMissingKeys([VMParserMemory]::OutputMap)
+        $this.CheckOutputTypes([VMParserMemory]::OutputMap)
     }
 
     hidden [void] ValidateMinMax()
@@ -89,17 +55,5 @@ class VMParserMemory
             Write-Warning "'Max' ($($this.workingObject['Max'] / 1GB)GB) must be greater than 'Boot' ($($this.workingObject['Boot'] / 1GB)GB), setting equal to 'Boot'"
             $this.workingObject['Max'] = $this.workingObject['Boot']
         }
-    }
-
-    [hashtable]Build()
-    {
-        $missingKeys = $this.OutputMap.Keys.Where{ $_ -notin $this.workingObject.Keys }
-
-        if ($missingKeys.Count -gt 0)
-        {
-            Write-Error -Message "Logic error, output is missing the following keys: `n - $($missingKeys -join "`n - ")" -ErrorAction Stop
-        }
-
-        return $this.workingObject
     }
 }
