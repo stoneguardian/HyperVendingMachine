@@ -12,11 +12,22 @@ class VMParserBase
         }
     }
 
-    hidden [void] ErrorIfKeyIsMissing([string]$key)
+    # Check if key is of type, if it is not try to cast it to that type
+    hidden [void] EnsureKeyIsOfType([string] $key, [System.Reflection.TypeInfo] $type)
     {
-        if (-not ($this.workingObject.ContainsKey($key)))
+        if ($this.workingObject[$key] -isnot $type)
         {
-            Write-Error -Message "'$key' is required" -ErrorAction Stop
+            $this.workingObject[$key] = ($this.workingObject[$key] -as $type)
+        }
+    }
+
+    hidden [void] CheckForRequiredKeys([string[]]$keys)
+    {
+        $missingRequiredKeys = $keys.Where{ $_ -notin $this.workingObject.Keys }
+
+        if ($missingRequiredKeys.Count -ne 0)
+        {
+            Write-Error -Message "Missing required keys:`n - $($missingRequiredKeys -join "`n - ")" -ErrorAction Stop
         }
     }
 
