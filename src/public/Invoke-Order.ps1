@@ -8,7 +8,27 @@ function Invoke-Order
     
     begin
     {
-        
+        function LogVerboseFunctionWithParameters
+        {
+            param(
+                [Parameter(Mandatory)]
+                [string] $FunctionName,
+
+                [Parameter(ValueFromPipeline)]
+                [hashtable] $FunctionParameters = @{}
+            )
+
+            switch ($FunctionParameters.Keys.Count)
+            {
+                0 { Write-Verbose -Message "Running function '$FunctionName' without parameters" }
+                default { Write-Verbose -Message "Running function '$FunctionName' with parameters:" }
+            }
+
+            foreach ($key in $FunctionParameters.Keys)
+            {
+                Write-Verbose -Message " -$($key): $($FunctionParameters[$key])"
+            }
+        }
     }
     
     process
@@ -24,6 +44,7 @@ function Invoke-Order
 
             if ($action.Command -eq 'NewVM')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'New-VM'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Creating VM"))
                 {
                     New-VM @functionParams
@@ -32,6 +53,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'SetVM')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'Set-VM'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Altering $($action.Parameters.Keys.Count - 1) properties on VM"))
                 {
                     Set-VM @functionParams
@@ -39,6 +61,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'StopVM')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'Stop-VM'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Stopping VM"))
                 {
                     Stop-VM @functionParams
@@ -46,6 +69,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'StartVM')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'Start-VM'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Starting VM"))
                 {
                     Start-VM @functionParams
@@ -53,6 +77,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'CreateVHDX')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'New-VHD'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Creating Virtual Disk"))
                 {
                     New-VHD @functionParams
@@ -60,6 +85,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'AddVHDXToVM')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'Add-VMHardDiskDrive'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Name, "Adding disk to VM: $($action.Parameters.Path)"))
                 {
                     Add-VMHardDiskDrive @functionParams
@@ -67,6 +93,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'ExpandVHDX')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'Resize-VHD'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Expand Virtual Disk to: $($action.Parameters.SizeBytes / 1GB)GB"))
                 {
                     Resize-VHD @functionParams
@@ -113,6 +140,7 @@ function Invoke-Order
             }
             elseif ($action.Command -eq 'SetDiskISO')
             {
+                $functionParams | LogVerboseFunctionWithParameters -FunctionName 'Set-VMDvdDrive'
                 if ($PSCmdlet.ShouldProcess($action.Parameters.Path, "Set disk for VM '$($action.Parameters.Path)'"))
                 {
                     Set-VMDvdDrive -VMName $action.Parameters.Name -Path $action.Parameters.Path
@@ -126,7 +154,7 @@ function Invoke-Order
                     $existingAdapter | Remove-VMNetworkAdapter
 
                     Add-VMNetworkAdapter -VMName $action.Parameters.VMName -SwitchName $action.Parameters.Switch
-                                       
+
                     if ($action.Parameters.Vlan -ne $false)
                     {
                         $newAdapter = Get-VMNetworkAdapter -VMName $action.Parameters.VMName
