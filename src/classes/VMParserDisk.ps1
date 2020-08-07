@@ -82,37 +82,13 @@ class VMParserDisks
     }
 }
 
-class VMParserSingleDisk
+class VMParserSingleDisk : VMParserBase
 {
     # Map of keys and types for output object
     static [hashtable] $OutputMap = @{
         'System' = [bool]
         'Name'   = [string]
         'Size'   = [long]
-    }
-
-    [System.Management.Automation.HiddenAttribute()]
-    [hashtable] $workingObject
-
-    # Output
-    [hashtable] Build()
-    {
-        $missingKeys = $this.OutputMap.Keys.Where{ $_ -notin $this.workingObject.Keys }
-
-        if ($missingKeys.Count -gt 0)
-        {
-            Write-Error -Message "Logic error, output is missing the following keys: `n - $($missingKeys -join "`n - ")" -ErrorAction Stop
-        }
-
-        return $this.workingObject
-    }
-
-    # Builder-pattern
-    [VMParserSingleDisk] AsSystemDisk([string] $VMName)
-    {
-        $this.workingObject['System'] = $true
-        $this.workingObject['Name'] = $VMName
-        return $this
     }
 
     # Constructors and helpers
@@ -143,45 +119,26 @@ class VMParserSingleDisk
     VMParserSingleDisk([hashtable] $order)
     {
         $this.workingObject = $order
-        if (-not $this.workingObject.ContainsKey('Size'))
-        {
-            Write-Error -Message "'Size' is required" -ErrorAction Stop
-        }
+        $this.CheckForRequiredKeys('Size')
         $this.CommonConstructor()
     }
 
-    [System.Management.Automation.HiddenAttribute()]
-    [void] CommonConstructor()
+    hidden [void] CommonConstructor()
     {
-        $this.EnsureKeyIsLong('Size')
-        $this.GenerateNameIfMissing()
-        $this.AddSystemIfMissing()
+        $this.EnsureKeyIsOfType('Size', [VMParserSingleDisk]::OutputMap['Size'])
+        $this.AddDefaultValueIfMissing('Name', [Guid]::NewGuid().ToString())
+        $this.AddDefaultValueIfMissing('System', $false)
+        $this.CheckOutputForMissingKeys([VMParserSingleDisk]::OutputMap)
+        $this.CheckOutputType([VMParserSingleDisk]::OutputMap)
     }
 
-    [System.Management.Automation.HiddenAttribute()]
-    [void] EnsureKeyIsLong([string] $key)
+    # Builder-pattern
+    [VMParserSingleDisk] AsSystemDisk([string] $VMName)
     {
-        if ($this.workingObject[$key] -isnot [long])
-        {
-            $this.workingObject[$key] = [long]$this.workingObject[$key]
-        }
-    }
-
-    [System.Management.Automation.HiddenAttribute()]
-    [void] GenerateNameIfMissing()
-    {
-        if (-not ($this.workingObject.ContainsKey('Name')))
-        {
-            $this.workingObject['Name'] = "$([Guid]::NewGuid())"
-        }
-    }
-
-    [System.Management.Automation.HiddenAttribute()]
-    [void] AddSystemIfMissing()
-    {
-        if (-not ($this.workingObject.ContainsKey('System')))
-        {
-            $this.workingObject['System'] = $false
-        }
+        $this.workingObject['System'] = $true
+        $this.workingObject['Name'] = $VMName
+        $this.CheckOutputForMissingKeys([VMParserSingleDisk]::OutputMap)
+        $this.CheckOutputType([VMParserSingleDisk]::OutputMap)
+        return $this
     }
 }
