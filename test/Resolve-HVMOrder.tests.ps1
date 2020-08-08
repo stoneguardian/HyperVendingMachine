@@ -341,7 +341,7 @@ Describe 'Resolve-HVMOrder' {
             $result.Network.Vlan | Should -Be $false
         }
 
-        It 'Errors if no switch is given' {
+        It 'Throws if no switch is given as input' {
             $testInput = @{
                 VMName  = 'Test'
                 Network = @{
@@ -350,6 +350,14 @@ Describe 'Resolve-HVMOrder' {
             }
 
             { $testInput | Resolve-HVMOrder } | Should -Throw -ExpectedMessage '* Switch'
+        }
+
+        It 'Validates output types' {
+            $testInput = @{
+                VMName  = 'Test'
+                Network = @{ Switch = $false; VlanId = "kake" }
+            }
+            { $testInput | Resolve-HVMOrder } | Should -Throw -ExpectedMessage "* type * but was *"
         }
     }
 }
