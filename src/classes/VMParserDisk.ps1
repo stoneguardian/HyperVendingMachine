@@ -9,10 +9,10 @@ class VMParserDisks
     [System.Management.Automation.HiddenAttribute()]
     [bool] $VMExists
 
-    VMParserDisks([string]$vmName)
+    VMParserDisks([string]$vmName, [bool]$vmExists)
     {
         $this.VMName = $vmName
-        $this.VMExists = $null -ne (Get-VM -Name $vmName -ErrorAction SilentlyContinue)
+        $this.VMExists = $vmExists
     }
 
     [VMParserDisks]WithInput([object[]] $order)

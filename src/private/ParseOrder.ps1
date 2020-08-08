@@ -26,7 +26,8 @@ function ParseOrder
 
         if ($Order.ContainsKey('Disks'))
         {
-            $Order['Disks'] = [VMParserDisks]::new($Order['VMName']).WithInput($Order['Disks']).Build()
+            $vmExists = $null -ne (Get-VM -Name $vmName -ErrorAction SilentlyContinue)
+            $Order['Disks'] = [VMParserDisks]::new($Order['VMName'], $vmExists).WithInput($Order['Disks']).Build()
         }
 
         if (-not ($Order.ContainsKey('Image')))
