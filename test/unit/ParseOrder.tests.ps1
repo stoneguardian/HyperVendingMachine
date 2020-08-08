@@ -8,22 +8,24 @@
 
 # ParseOrder
 Describe 'ParseOrder' {
-    # Mock Get-VM if command is available
-    if ($null -ne (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
-    {
-        Mock -CommandName 'Get-VM' -MockWith {
-            return $null
-        }
-    }
-    else 
-    {
-        function Get-VM
+    BeforeAll {
+        # Mock Get-VM if command is available
+        if ($null -ne (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
         {
-            [CmdletBinding()]
-            param([string] $Name)
-        
-            return $null
-        }    
+            Mock -CommandName 'Get-VM' -MockWith {
+                return $null
+            }
+        }
+        else 
+        {
+            function Get-VM
+            {
+                [CmdletBinding()]
+                param([string] $Name)
+    
+                return $null
+            }    
+        }
     }
 
     Context 'Memory' {
@@ -127,7 +129,7 @@ Describe 'ParseOrder' {
                 }
             }
             @{
-                case = 'Single disk, no system (string)'
+                case = 'Single disk, hashtable, no system (string)'
                 obj  = @{
                     VMName = 'test' # Mandatory
                     Disks  = @(
@@ -138,7 +140,7 @@ Describe 'ParseOrder' {
                 }
             }
             @{
-                case = 'Single disk (string)'
+                case = 'Single disk, hashtable, has system (string)'
                 obj  = @{
                     VMName = 'test' # Mandatory
                     Disks  = @(
@@ -150,7 +152,7 @@ Describe 'ParseOrder' {
                 }
             }
             @{
-                case = 'Multiple disks (string)'
+                case = 'Multiple disks, hashtable, one has system (string)'
                 obj  = @{
                     VMName = 'test' # Mandatory
                     Disks  = @(
@@ -211,7 +213,7 @@ Describe 'ParseOrder' {
                 )
             }
 
-            { $obj | ParseOrder } | Should -Throw "only one"
+            { $obj | ParseOrder } | Should -Throw -ExpectedMessage "Only one*"
         }
 
         It 'Is array - <case>' -TestCases $diskTestCases {
@@ -239,6 +241,13 @@ Describe 'ParseOrder' {
             {
                 $disk.Size | Should -BeOfType [long]
             }
+        }
+
+        It 'Ensures System-disk has the same name as the VM - <case>' -TestCases $diskTestCases {
+            param($obj)
+            $result = $obj | ParseOrder
+            $systemDisk = $result.Disks.Where{ $_.System } | Select-Object -First 1
+            $systemDisk.Name | Should -Be $obj.VMName
         }
     }
 
@@ -292,7 +301,7 @@ Describe 'ParseOrder' {
                 }
             }
 
-            { $testInput | ParseOrder } | Should -Throw 'Switch'
+            { $testInput | ParseOrder } | Should -Throw -ExpectedMessage '* Switch'
         }
     }
 }

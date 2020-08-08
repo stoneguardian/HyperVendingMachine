@@ -18,8 +18,8 @@ Describe 'Class: VMParserMemory' {
     }
 
     It 'Throws if input is missing mandatory keys ([hashtable])' {
-        { [VMParserMemory]::new(@{ Dynamic = $true }) } | Should -Throw "Boot"
-        { [VMParserMemory]::new(@{ Boot = 1GB }) } | Should -Throw "Dynamic"
+        { [VMParserMemory]::new(@{ Dynamic = $true }) } | Should -Throw -ExpectedMessage "*Boot"
+        { [VMParserMemory]::new(@{ Boot = 1GB }) } | Should -Throw -ExpectedMessage "*Dynamic"
     }
 
     $genTestCases = @(

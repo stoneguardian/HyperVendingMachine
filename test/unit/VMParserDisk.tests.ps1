@@ -20,7 +20,7 @@ Describe 'Class: VMParserSingleDisk' {
     }
 
     It 'Ensures required input is given' {
-        { [VMParserSingleDisk]::new(@{ System = $true }) } | Should -Throw "Size"
+        { [VMParserSingleDisk]::new(@{ System = $true }) } | Should -Throw -ExpectedMessage "* Size"
     }
 
     $missingValuesTestCases = @(
@@ -75,22 +75,24 @@ Describe 'Class: VMParserSingleDisk' {
 }
 
 Describe 'Class: VMParserDisks' {
-    # Mock Get-VM if command is available
-    if ($null -ne (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
-    {
-        Mock -CommandName 'Get-VM' -MockWith {
-            return $null
-        }
-    }
-    else 
-    {
-        function Get-VM
+    BeforeAll {
+        # Mock Get-VM if command is available
+        if ($null -ne (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
         {
-            [CmdletBinding()]
-            param([string] $Name)
-        
-            return $null
-        }    
+            Mock -CommandName 'Get-VM' -MockWith {
+                return $null
+            }
+        }
+        else 
+        {
+            function Get-VM
+            {
+                [CmdletBinding()]
+                param([string] $Name)
+    
+                return $null
+            }    
+        }
     }
 
     It 'Accepts multiple different types as input' {
@@ -141,7 +143,7 @@ Describe 'Class: VMParserDisks' {
     It 'Only allows one system disk' {
         { 
             [VMParserDisks]::new('test').WithInput(@(@{System = $true; Size = 1GB }, @{System = $true; Size = 1GB })).Build()
-        } | Should -Throw "Only one"
+        } | Should -Throw -ExpectedMessage "Only one*"
     }
 
     It 'Ensures the system-disk is the first in the list' {
