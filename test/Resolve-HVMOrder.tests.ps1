@@ -1,35 +1,28 @@
-BeforeAll {
-    # Load required files
-    . $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
-    . $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
-    . $PSScriptRoot\..\..\src\classes\VMParserDisk.ps1
-    . $PSScriptRoot\..\..\src\classes\VMParserNetwork.ps1
-    . $PSScriptRoot\..\..\src\private\ParseOrder.ps1
-}
-
-# ParseOrder
-Describe 'ParseOrder' {
+Describe 'Resolve-HVMOrder' {
+    
     BeforeAll {
-        # Mock Get-VM if command is available
-        if ($null -ne (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
+        # Create dummy "Get-VM" if Hyper-V module is not installed
+        if ($null -eq (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
         {
-            Mock -CommandName 'Get-VM' -MockWith {
-                return $null
-            }
-        }
-        else 
-        {
-            function Get-VM
+            # "global:" required for mock to see function
+            function global:Get-VM
             {
                 [CmdletBinding()]
                 param([string] $Name)
     
                 return $null
-            }    
+            }
         }
+
+        # Build module and import it
+        . $PSScriptRoot/../build.ps1
+    
+        Import-Module $PSScriptRoot/../release/HyperVendingMachine/HyperVendingMachine.psd1 -Force
+
+        Mock -CommandName 'Get-VM' -ModuleName HyperVendingMachine
     }
 
-    Context 'Memory' {
+    Context 'Memory' -Tag 'Order-Mem' {
         $memTestCases = @(
             @{ 
                 case = 'Minimal object (string)' 
@@ -37,6 +30,7 @@ Describe 'ParseOrder' {
                     VMName = 'test' # Mandatory
                     Memory = '512MB'
                 }
+                type = [string]
             }
             @{
                 case = 'Minimal object (long)'
@@ -44,6 +38,7 @@ Describe 'ParseOrder' {
                     VMName = 'test' # Mandatory
                     Memory = 1073741824
                 }
+                type = [long]
             }
             @{
                 case = 'Dynamic memory without min,max (string)'
@@ -54,6 +49,7 @@ Describe 'ParseOrder' {
                         Boot    = '512MB'
                     }
                 }
+                type = [hashtable]
             }
             @{
                 case = 'Dynamic memory without min (string)'
@@ -90,30 +86,66 @@ Describe 'ParseOrder' {
             }
         )
 
-        It 'Is hashtable - <case>' -TestCases $memTestCases {
+        $memTypeTestCases = $memTestCases.Where{ 'type' -in $_.Keys }
+
+        It 'Accepts [<type>] as input' -TestCases $memTypeTestCases {
             param($obj)
-            $result = $obj | ParseOrder
+            { $obj | Resolve-HVMOrder } # Should not throw
+        }
+
+        It 'Throws if imput is missing mandatory keys for [hashtable]' {
+            { @{ VMName = 'test'; Memory = @{ Dynamic = $true } } | Resolve-HVMOrder } | Should -Throw -ExpectedMessage "*Boot"
+            { @{ VMName = 'test'; Memory = @{ Boot = 1GB } } | Resolve-HVMOrder } | Should -Throw -ExpectedMessage "*Dynamic"
+        }
+
+        It 'Allways outputs a hashtable - <case>' -TestCases $memTestCases {
+            param($obj)
+            $result = $obj | Resolve-HVMOrder
             $result.Memory | Should -BeOfType [hashtable]
         }
 
-        It 'Adds missing properties - <case>' -TestCases $memTestCases {
+        It 'Allways outputs the same keys for all input - <case>' -TestCases $memTestCases {
             param($obj)
-            $result = $obj | ParseOrder
-            $missingKeys = [VMParserMemory]::OutputMap.Keys.Where{ $_ -notin $result.Memory.Keys }
+            $result = $obj | Resolve-HVMOrder
+            $missingKeys = @('Dynamic', 'Boot', 'Min', 'Max').Where{ $_ -notin $result.Memory.Keys }
             $missingKeys -join ', ' | Should -BeNullOrEmpty
         }
 
         It 'Ensures numbers are [long] - <case>' -TestCases $memTestCases {
             param($obj)
-            $result = $obj | ParseOrder
+            $result = $obj | Resolve-HVMOrder
 
             $result.Memory.Boot | Should -BeOfType [long]
             $result.Memory.Min | Should -BeOfType [long]
             $result.Memory.Max | Should -BeOfType [long]
         }
+
+        It 'Ensures "Max" is not less than "Boot"' {
+            $result = @{
+                VMName = 'test'
+                Memory = @{
+                    Dynamic = $true
+                    Boot    = 1GB
+                    Max     = 512MB
+                }
+            }
+            $result.Max | Should -Be $order.Boot
+        }
+    
+        It 'Ensures "Min" is not greater than "Boot"' {
+            $result = @{
+                VMName = 'test'
+                Memory = @{
+                    Dynamic = $true
+                    Boot    = 1GB
+                    Min     = 2GB
+                }
+            }
+            $result.Min | Should -Be $order.Boot
+        }
     }
 
-    Context 'Disk' {
+    Context 'Disk' -Tag 'Order-Disk' {
         $diskTestCases = @(
             @{ 
                 case = 'Minimal object (string)' 
@@ -175,7 +207,7 @@ Describe 'ParseOrder' {
                 VMName = 'test' # Mandatory
                 Disks  = '10GB'
             }
-            $result = $obj | ParseOrder
+            $result = $obj | Resolve-HVMOrder
             #$result.Disks | Should -BeOfType [System.Object[]]
             $result.Disks | Should -BeOfType [System.Collections.Hashtable]
             $result.Disks.Count | Should -Be 1
@@ -195,7 +227,7 @@ Describe 'ParseOrder' {
                 )
             }
 
-            $result = $obj | ParseOrder
+            $result = $obj | Resolve-HVMOrder
             $result.Disks[0].System | Should -Be $true
         }
 
@@ -214,18 +246,18 @@ Describe 'ParseOrder' {
                 )
             }
 
-            { $obj | ParseOrder } | Should -Throw -ExpectedMessage "Only one*"
+            { $obj | Resolve-HVMOrder } | Should -Throw -ExpectedMessage "Only one*"
         }
 
         It 'Is array - <case>' -TestCases $diskTestCases {
             param($obj)
-            $result = $obj | ParseOrder
+            $result = $obj | Resolve-HVMOrder
             $result.Disks | Should -BeOfType [System.Collections.Hashtable]
         }
 
         It 'Adds missing properties - <case>' -TestCases $diskTestCases {
             param($obj)
-            $result = $obj | ParseOrder
+            $result = $obj | Resolve-HVMOrder
 
             foreach ($disk in $result.Disks)
             {
@@ -236,7 +268,7 @@ Describe 'ParseOrder' {
 
         It 'Ensures .Size is [long] - <case>' -TestCases $diskTestCases {
             param($obj)
-            $result = $obj | ParseOrder
+            $result = $obj | Resolve-HVMOrder
 
             foreach ($disk in $result.Disks)
             {
@@ -246,7 +278,7 @@ Describe 'ParseOrder' {
 
         It 'Ensures System-disk has the same name as the VM - <case>' -TestCases $diskTestCases {
             param($obj)
-            $result = $obj | ParseOrder
+            $result = $obj | Resolve-HVMOrder
             $systemDisk = $result.Disks.Where{ $_.System } | Select-Object -First 1
             $systemDisk.Name | Should -Be $obj.VMName
         }
@@ -256,7 +288,7 @@ Describe 'ParseOrder' {
         It 'Ensures .Image is "None" if no key specified' {
             $result = @{
                 VMName = 'test'
-            } | ParseOrder
+            } | Resolve-HVMOrder
 
             $result.Image | Should -Be 'None'
         }
@@ -265,18 +297,18 @@ Describe 'ParseOrder' {
             $result = @{
                 VMName = 'test'
                 Image  = 'Ubuntu/Bionic'
-            } | ParseOrder
+            } | Resolve-HVMOrder
 
             $result.Image | Should -Be 'Ubuntu/Bionic'
         }
     }
 
-    Context 'Network' {
+    Context 'Network' -Tag 'Order-Network' {
         It 'Converts string to Switch with no VLAN set' {
             $result = @{
                 VMName  = 'Test'
                 Network = 'Switch-Name'
-            } | ParseOrder
+            } | Resolve-HVMOrder
 
             $result.Network.Switch | Should -Be 'Switch-Name'
             $result.Network.Vlan | Should -Be $false
@@ -288,7 +320,7 @@ Describe 'ParseOrder' {
                 Network = @{
                     Switch = 'Switch-Name'
                 }
-            } | ParseOrder
+            } | Resolve-HVMOrder
 
             $result.Network.Switch | Should -Be 'Switch-Name'
             $result.Network.Vlan | Should -Be $false
@@ -302,7 +334,7 @@ Describe 'ParseOrder' {
                 }
             }
 
-            { $testInput | ParseOrder } | Should -Throw -ExpectedMessage '* Switch'
+            { $testInput | Resolve-HVMOrder } | Should -Throw -ExpectedMessage '* Switch'
         }
     }
 }
