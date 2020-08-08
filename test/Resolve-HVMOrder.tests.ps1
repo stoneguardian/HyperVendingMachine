@@ -153,6 +153,7 @@ Describe 'Resolve-HVMOrder' {
                     VMName = 'test' # Mandatory
                     Disks  = '10GB'
                 }
+                type = [string]
             }
             @{
                 case = 'Minimal object (long)'
@@ -160,6 +161,7 @@ Describe 'Resolve-HVMOrder' {
                     VMName = 'test' # Mandatory
                     Disks  = 5368709120
                 }
+                type = [long]
             }
             @{
                 case = 'Single disk, hashtable, no system (string)'
@@ -171,6 +173,7 @@ Describe 'Resolve-HVMOrder' {
                         }
                     )
                 }
+                type = [hashtable]
             }
             @{
                 case = 'Single disk, hashtable, has system (string)'
@@ -199,8 +202,16 @@ Describe 'Resolve-HVMOrder' {
                         }
                     )
                 }
+                type = [hashtable[]]
             }
         )
+
+        $diskTypeTestCases = $diskTestCases.Where{ 'type' -in $_.Keys }
+
+        It 'Accepts [<type>] as input' -TestCases $diskTypeTestCases {
+            param($obj)
+            { $obj | Resolve-HVMOrder } # Should not throw
+        }
 
         It 'Converts single value to one disk' {
             $obj = @{
@@ -249,13 +260,17 @@ Describe 'Resolve-HVMOrder' {
             { $obj | Resolve-HVMOrder } | Should -Throw -ExpectedMessage "Only one*"
         }
 
-        It 'Is array - <case>' -TestCases $diskTestCases {
+        It 'Allways outputs an array - <case>' -TestCases $diskTestCases {
             param($obj)
             $result = $obj | Resolve-HVMOrder
             $result.Disks | Should -BeOfType [System.Collections.Hashtable]
         }
 
-        It 'Adds missing properties - <case>' -TestCases $diskTestCases {
+        It 'Throws if input is missing mandatory keys for [hashtable]' {
+            { @{ VMName = 'test'; Disks = @{ Test = $true } } | Resolve-HVMOrder } | Should -Throw -ExpectedMessage "*Size"
+        }
+
+        It 'Allways outputs the same keys for all input - <case>' -TestCases $diskTestCases {
             param($obj)
             $result = $obj | Resolve-HVMOrder
 
