@@ -1,12 +1,16 @@
-# Load required files
-. $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
-. $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
-
-# Silence warning-output
-$_currentWarningPreference = "$WarningPreference"
-$WarningPreference = 'SilentlyContinue'
+BeforeAll {
+    # Load required files
+    . $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
+    . $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
+}
 
 Describe 'Class: VMParserMemory' {
+    BeforeAll { 
+        # Silence warning-output
+        $_currentWarningPreference = "$WarningPreference"
+        $WarningPreference = 'SilentlyContinue' 
+    }
+
     $constructorInputTestCases = @(
         @{type = [string]; value = '1GB' }
         @{type = [hashtable]; value = @{Dynamic = $true; Boot = 1GB } }
@@ -62,7 +66,10 @@ Describe 'Class: VMParserMemory' {
         $result = [VMParserMemory]::new($order).Build()
         $result.Min | Should -Be $order.Boot
     }
+
+    AfterAll {
+        # Reset warning-output
+        $WarningPreference = $_currentWarningPreference
+    }
 }
 
-# Reset warning-output
-$WarningPreference = $_currentWarningPreference

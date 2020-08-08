@@ -1,6 +1,8 @@
-# Load required files
-. $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
-. $PSScriptRoot\..\..\src\classes\VMParserNetwork.ps1
+BeforeAll {
+    # Load required files
+    . $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
+    . $PSScriptRoot\..\..\src\classes\VMParserNetwork.ps1
+}
 
 Describe 'Class: VMParserNetwork' {
     $validConstructorInputTestCases = @(

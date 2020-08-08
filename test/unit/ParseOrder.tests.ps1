@@ -1,10 +1,11 @@
-# Load required files
-. $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
-. $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
-. $PSScriptRoot\..\..\src\classes\VMParserDisk.ps1
-. $PSScriptRoot\..\..\src\classes\VMParserNetwork.ps1
-. $PSScriptRoot\..\..\src\private\ParseOrder.ps1
-
+BeforeAll {
+    # Load required files
+    . $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
+    . $PSScriptRoot\..\..\src\classes\VMParserMemory.ps1
+    . $PSScriptRoot\..\..\src\classes\VMParserDisk.ps1
+    . $PSScriptRoot\..\..\src\classes\VMParserNetwork.ps1
+    . $PSScriptRoot\..\..\src\private\ParseOrder.ps1
+}
 
 # ParseOrder
 Describe 'ParseOrder' {

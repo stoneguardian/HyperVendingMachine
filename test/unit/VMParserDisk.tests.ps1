@@ -1,10 +1,12 @@
-# Load required files
-. $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
-. $PSScriptRoot\..\..\src\classes\VMParserDisk.ps1
+BeforeAll {
+    # Load required files
+    . $PSScriptRoot\..\..\src\classes\VMParserBase.ps1
+    . $PSScriptRoot\..\..\src\classes\VMParserDisk.ps1
 
-# Silence warning-output
-$_currentWarningPreference = "$WarningPreference"
-$WarningPreference = 'SilentlyContinue'
+    # Silence warning-output
+    $_currentWarningPreference = "$WarningPreference"
+    $WarningPreference = 'SilentlyContinue'
+}
 
 Describe 'Class: VMParserSingleDisk' {
     $constructorInputTestCases = @(
@@ -76,6 +78,10 @@ Describe 'Class: VMParserSingleDisk' {
 
 Describe 'Class: VMParserDisks' {
     BeforeAll {
+        # Silence warning-output
+        $_currentWarningPreference = "$WarningPreference"
+        $WarningPreference = 'SilentlyContinue'
+    
         # Mock Get-VM if command is available
         if ($null -ne (Get-Command 'Get-VM' -ErrorAction SilentlyContinue))
         {
@@ -154,7 +160,10 @@ Describe 'Class: VMParserDisks' {
         $result[0].System | Should -BeTrue
         $result[1].System | Should -BeFalse -Because "second disk should not be system-disk"
     }
+
+    AfterAll {
+        # Reset warning-output
+        $WarningPreference = $_currentWarningPreference
+    }
 }
 
-# Reset warning-output
-$WarningPreference = $_currentWarningPreference

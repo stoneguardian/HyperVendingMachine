@@ -1,4 +1,6 @@
-. $PSScriptRoot\..\..\src\private\RenderCloudInitUserData.ps1
+BeforeAll {
+    . $PSScriptRoot\..\..\src\private\RenderCloudInitUserData.ps1
+}
 
 Describe 'RenderCloudInitUserData' {
     It 'Generates hostname and fqdn automatically' {
