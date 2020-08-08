@@ -23,38 +23,32 @@ class VMParserDisks
             return $this
         }
 
-        # Just "Passthru" if VM exists
-        if ($this.VMExists)
+        $singleDisks = foreach ($item in $order)
         {
-            $this.workingObject = foreach ($item in $order)
-            {
-                [VMParserSingleDisk]::new($item).Build() # Write-Output -> $this.workingObject
-            }
+            [VMParserSingleDisk]::new($item)
         }
-        else 
+        
+
+        # If the VM does not exist, ensure a system disk exists
+        if (-not $this.VMExists)
         {
-            $initial = foreach ($item in $order)
+            $systemDisk = @($singleDisks).Where{ $_.workingObject.System -eq $true } | Select-Object -First 1
+            if ($systemDisk.Count -eq 0)
             {
-                [VMParserSingleDisk]::new($item) # Write-Output -> $initial
+                # Convert first disk to system-disk
+                $singleDisks[0].AsSystemDisk($this.VMname)
             }
-
-            $initial = @($initial) # Force list-type
-
-            # Ensure one disk has ['System'] = $true
-            $hasSystemDisk = $initial.Where{ $_.workingObject.System -eq $true }.Count -gt 0
-
-            if (-not $hasSystemDisk)
+            else 
             {
-                # Convert first to system-disk
-                $initial[0] = $initial[0].AsSystemDisk($this.VMName)
-            }
-
-            $this.workingObject = foreach ($item in $initial)
-            {
-                $item.Build() # Write-Output -> $this.workingObject
+                # Ensure Name == VMName
+                $systemDisk.AsSystemDisk($this.VMName)
             }
         }
 
+        $this.workingObject = foreach ($disk in $singleDisks)
+        {
+            $disk.Build() # Write-Output -> $this.workingObject
+        }
         return $this # "Fluent"
     }
 
