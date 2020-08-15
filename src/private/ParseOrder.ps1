@@ -26,7 +26,7 @@ function ParseOrder
 
         if ($Order.ContainsKey('Disks'))
         {
-            $vmExists = $null -ne (Get-VM -Name $vmName -ErrorAction SilentlyContinue)
+            $vmExists = $null -ne (Get-VM -Name $Order['VMName'] -ErrorAction SilentlyContinue)
             $Order['Disks'] = [VMParserDisks]::new($Order['VMName'], $vmExists).WithInput($Order['Disks']).Build()
         }
 
