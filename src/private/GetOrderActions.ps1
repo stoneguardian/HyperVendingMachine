@@ -122,7 +122,7 @@ function GetOrderActions
             }
 
             $ci_metadata = @"
-instance_id: iid-12345
+instance_id: uuid-$([Guid]::NewGuid())
 local-hostname: $($Order['VMName'].ToLower())
 "@
 
