@@ -135,7 +135,7 @@ function Invoke-Order
                     Set-Content -Path "$_tempfolder\meta-data" -Value ([byte[]][char[]] "$($action.Parameters.MetaData)") -Encoding Byte -Force
                     Set-Content -Path "$_tempfolder\user-data" -Value ([byte[]][char[]] "$($action.Parameters.UserData)") -Encoding Byte -Force
 
-                    & ($action.Parameters.oscdimgPath) "$_tempfolder" "$_isopath" -j2 -lcidata
+                    $null = & ($action.Parameters.oscdimgPath) "$_tempfolder" "$_isopath" -j2 -lcidata
                 }
             }
             elseif ($action.Command -eq 'SetDiskISO')
